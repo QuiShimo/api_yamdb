@@ -31,5 +31,22 @@ class User(AbstractUser):
         help_text='Введите свой электронный адрес'
     )
 
+    confirmation_code = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name='Код для авторизации'
+    )
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['username', 'email'],
+                name='unique_username_email'
+            )
+        ]
+
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+

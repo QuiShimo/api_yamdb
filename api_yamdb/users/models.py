@@ -18,7 +18,6 @@ class User(AbstractUser):
     )
 
     bio = models.TextField(
-        'Биография',
         max_length=300,
         blank=True,
         verbose_name='Заметка о пользователе',
@@ -26,7 +25,6 @@ class User(AbstractUser):
     )
 
     email = models.EmailField(
-        'Адрес электронной почты',
         blank=False,
         unique=True,
         verbose_name='Электронная почта пользователя',

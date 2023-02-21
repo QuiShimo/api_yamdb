@@ -13,18 +13,24 @@ class User(AbstractUser):
         max_length=16,
         choices=CHOICES,
         default='user',
+        verbose_name='Уровень доступа пользователя',
+        help_text='Уровень доступа пользователя'
     )
 
     bio = models.TextField(
         'Биография',
         max_length=300,
         blank=True,
+        verbose_name='Заметка о пользователе',
+        help_text='Напишите заметку о себе'
     )
+
     email = models.EmailField(
         'Адрес электронной почты',
         blank=False,
         unique=True,
-
+        verbose_name='Электронная почта пользователя',
+        help_text='Введите свой электронный адрес'
     )
 
     def __str__(self):

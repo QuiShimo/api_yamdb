@@ -31,16 +31,22 @@ class Title(models.Model):
     name = models.CharField(max_length=256,
                             verbose_name='Название',
                             help_text='Необходимо названия произведения')
+
     description = models.TextField(null=True, blank=True,
                                    verbose_name='Описание',
                                    help_text='Необходимо описание')
+
     year = models.IntegerField(verbose_name='Дата выхода',
                                help_text='Укажите дату выхода')
+
     category = models.ForeignKey(Category,
+                                 on_delete=models.SET_NULL,
+                                 null=True,
                                  related_name='titles',
                                  verbose_name='Катигория',
                                  help_text='Укажите категорию')
-    genres = models.ManyToManyField(Category,
+
+    genres = models.ManyToManyField(Genre,
                                     related_name='titles',
                                     verbose_name='Жанр',
                                     help_text='Укажите жанр')

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from reviews.models import Title, Genre, Category
+from reviews.models import Category, Genre, Title
 
 
 class GanreSerializer(serializers.ModelSerializer):
@@ -9,7 +9,6 @@ class GanreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = ('name', 'slug')
         lookup_field = 'slug'

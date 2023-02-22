@@ -1,6 +1,6 @@
-from rest_framework import viewsets, filters
+from api.serializers import CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import CategorySerializer
+from rest_framework import filters, viewsets
 from reviews.models import Category
 
 

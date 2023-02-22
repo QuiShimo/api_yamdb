@@ -9,8 +9,10 @@ class GanreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
         model = Category
 
 

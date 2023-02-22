@@ -17,12 +17,18 @@ from users.token import get_tokens_for_user
 def user_registration(request):
     serializer = UserRegister(data=request.data)
     if serializer.is_valid() and request.data['username'] != 'me':
-        email = request.data['email']
-        username = request.data['username']
         confirmation_code = int(''.join([str(random.randrange(0, 10))
                                          for _ in range(16)]))
-        User.objects.create(email=email, username=username,
-                            confirmation_code=confirmation_code)
+        email = request.data['email']
+        username = request.data['username']
+        user = User.objects.filter(username=username).exists()
+        if not user:
+            User.objects.create(email=email, username=username,
+                                confirmation_code=confirmation_code)
+        else:
+            User.objects.filter(username=username).update(
+                confirmation_code=confirmation_code
+            )
         mail_code(email, username, confirmation_code)
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

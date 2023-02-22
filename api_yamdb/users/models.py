@@ -31,8 +31,7 @@ class User(AbstractUser):
         help_text='Введите свой электронный адрес'
     )
 
-    confirmation_code = models.CharField(
-        max_length=50,
+    confirmation_code = models.IntegerField(
         blank=True,
         verbose_name='Код для авторизации'
     )

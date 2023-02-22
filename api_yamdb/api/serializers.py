@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Review, Title
+from reviews.models import Category, Comments, Genre, Review, Title
 
 
 class GanreSerializer(serializers.ModelSerializer):
@@ -49,3 +49,16 @@ class ReviewSerializer(serializers.ModelSerializer):
                  'вы уже добавляли отзыв к этопу произведению.')
             )
         return data
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        models = Comments
+        fields = ('id', 'text', 'author', 'pub_date')
+        read_only_fields = ('pub_date',)

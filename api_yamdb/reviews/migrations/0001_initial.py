@@ -13,29 +13,29 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(help_text='Необходимо названия котегории', max_length=256, verbose_name='Название')),
+                ('slug', models.SlugField(help_text='Необходим индификатор категории', unique=True, verbose_name='Индификатор')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Genre',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(help_text='Необходимо названия жанра', max_length=256, verbose_name='Название')),
+                ('slug', models.SlugField(help_text='Необходим индификатор жанра', unique=True, verbose_name='Идентификатор')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Title',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(help_text='Необходимо названия произведения', max_length=256, verbose_name='Название')),
+                ('description', models.TextField(blank=True, help_text='Необходимо описание', null=True, verbose_name='Описание')),
+                ('year', models.IntegerField(help_text='Укажите дату выхода', verbose_name='Дата выхода')),
+                ('category', models.ForeignKey(help_text='Укажите категорию', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='titles', to='reviews.category', verbose_name='Катигория')),
+                ('genres', models.ManyToManyField(help_text='Укажите жанр', related_name='titles', to='reviews.Genre', verbose_name='Жанр')),
             ],
         ),
-        migrations.CreateModel(
-            name='User',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Review',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(verbose_name='Текст отзыва')),
-                ('pub_date', models.DateTimeField(auto_now_add=True, help_text='Дата публикации отзыва, проставляется автоматически.', verbose_name='Дата публикации')),
-                ('author', models.ForeignKey(help_text='Пользователь, который оставил отзыв', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.user', verbose_name='Автор отзыва')),
-                ('title', models.ForeignKey(help_text='Выберите произведение, к которому хотите оставить отзыв', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.title', verbose_name='Произведение')),
-            ],
-        ),
-        migrations.AddConstraint(
-            model_name='review',
-            constraint=models.UniqueConstraint(fields=('author', 'title'), name='unique reviews'),
-        ),
-    ]

@@ -1,7 +1,17 @@
-from api.serializers import ReviewSerializer
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from reviews.models import Title
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
+
+from api.serializers import CategorySerializer, ReviewSerializer
+from reviews.models import Category, Title
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

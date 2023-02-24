@@ -5,7 +5,8 @@ from reviews.models import Category, Genre, Review, Title
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
         model = Genre
 
 

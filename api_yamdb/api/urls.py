@@ -5,7 +5,7 @@ from api.views import CategoryViewSet, ReviewViewSet, GenreViewSet
 
 router = DefaultRouter()
 router.register('categories', CategoryViewSet, basename='categories')
-router.register('genre', GenreViewSet, basename='genre')
+router.register('genres', GenreViewSet, basename='genres')
 router.register(
     r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,

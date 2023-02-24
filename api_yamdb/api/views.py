@@ -2,8 +2,9 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 
-from api.serializers import CategorySerializer, ReviewSerializer
-from reviews.models import Category, Title
+from api.serializers import (CategorySerializer, CommentsSerializer,
+                             ReviewSerializer)
+from reviews.models import Category, Review, Title
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -24,3 +25,23 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title = get_object_or_404(Title, pk=int(self.kwargs.get('title_id')))
         return title.reviews.all()
+
+
+class CommentsViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentsSerializer
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(
+            Review,
+            pk=int(self.kwargs.get('review_id')),
+            title__id=int(self.kwargs.get('title_id'))
+        )
+        serializer.save(author=self.request.user, review=review)
+
+    def get_queryset(self):
+        review = get_object_or_404(
+            Review,
+            pk=int(self.kwargs.get('review_id')),
+            title__id=int(self.kwargs.get('title_id'))
+        )
+        return review.comments.all()

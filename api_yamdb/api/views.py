@@ -1,9 +1,8 @@
+from api.serializers import (CategorySerializer, GenreSerializer,
+                             ReviewSerializer)
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
-
-from api.serializers import (CategorySerializer, GenreSerializer,
-                             ReviewSerializer)
 from reviews.models import Category, Genre, Title
 
 

@@ -1,16 +1,15 @@
 from rest_framework import serializers
-from rest_framework.generics import get_object_or_404
 
 from users.models import User
 
 
-class UserRegister(serializers.ModelSerializer):
+class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('email', 'username')
 
 
-class UserSignUp(serializers.Serializer):
+class AuthTokenserializer(serializers.Serializer):
     username = serializers.RegexField(
         regex=r'^[\w.@+-]+$',
         max_length=150,
@@ -20,5 +19,3 @@ class UserSignUp(serializers.Serializer):
         required=True,
         max_length=16,
     )
-
-

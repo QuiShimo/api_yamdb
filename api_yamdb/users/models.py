@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    '''Модель пользователя'''
+    """Модель пользователя"""
     CHOICES = (
         ('user', 'Аутентифицированный пользователь'),
         ('moderator', 'Модератор'),
@@ -31,9 +31,10 @@ class User(AbstractUser):
         help_text='Введите свой электронный адрес'
     )
 
-    confirmation_code = models.IntegerField(
+    confirmation_code = models.CharField(
         blank=True,
-        verbose_name='Код для авторизации'
+        verbose_name='Код для авторизации',
+        max_length=16,
     )
 
     class Meta:
@@ -48,4 +49,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
-

@@ -1,5 +1,25 @@
 from rest_framework import serializers
-from reviews.models import Category, Genre, Review, Title
+from reviews.models import Category, Comments, Genre, Review, Title
+
+from users.models import User
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'username')
+
+
+class AuthTokenserializer(serializers.Serializer):
+    username = serializers.RegexField(
+        regex=r'^[\w.@+-]+$',
+        max_length=150,
+        required=True
+    )
+    confirmation_code = serializers.CharField(
+        required=True,
+        max_length=16,
+    )
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -49,3 +69,16 @@ class ReviewSerializer(serializers.ModelSerializer):
                  'вы уже добавляли отзыв к этопу произведению.')
             )
         return data
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        models = Comments
+        fields = ('id', 'text', 'author', 'pub_date')
+        read_only_fields = ('pub_date',)

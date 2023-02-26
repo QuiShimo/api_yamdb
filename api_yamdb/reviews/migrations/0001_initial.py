@@ -3,6 +3,8 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -31,6 +33,13 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='GenreTitle',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('genre', models.ForeignKey(help_text='Необходим жанр', on_delete=django.db.models.deletion.CASCADE, to='reviews.genre', verbose_name='Жанр')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Title',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -38,7 +47,17 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, help_text='Необходимо описание', null=True, verbose_name='Описание')),
                 ('year', models.IntegerField(help_text='Укажите дату выхода', verbose_name='Дата выхода')),
                 ('category', models.ForeignKey(help_text='Укажите категорию', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='titles', to='reviews.category', verbose_name='Катигория')),
-                ('genres', models.ManyToManyField(help_text='Укажите жанр', related_name='titles', to='reviews.Genre', verbose_name='Жанр')),
+                ('genres', models.ManyToManyField(help_text='Укажите жанр', related_name='titles', through='reviews.GenreTitle', to='reviews.Genre', verbose_name='Жанр')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Review',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('text', models.TextField(verbose_name='Текст отзыва')),
+                ('pub_date', models.DateTimeField(auto_now_add=True, help_text='Дата публикации отзыва, проставляется автоматически.', verbose_name='Дата публикации')),
+                ('author', models.ForeignKey(help_text='Пользователь, который оставил отзыв', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to=settings.AUTH_USER_MODEL, verbose_name='Автор отзыва')),
+                ('title', models.ForeignKey(help_text='Выберите произведение, к которому хотите оставить отзыв', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.title', verbose_name='Произведение')),
             ],
         ),
         migrations.CreateModel(
@@ -60,6 +79,7 @@ class Migration(migrations.Migration):
                 ('author', models.ForeignKey(help_text='Пользователь, который оставил комментарий', on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL, verbose_name='Автор комментария')),
                 ('review', models.ForeignKey(help_text='Отзыв, к которому оставляют комментарий', on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='reviews.review', verbose_name='Отзыв')),
             ],
+
         ),
         migrations.AddConstraint(
             model_name='review',

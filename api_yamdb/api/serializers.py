@@ -1,6 +1,6 @@
 from rest_framework import serializers
-
 from reviews.models import Category, Comments, Genre, Review, Title
+
 from users.models import User
 
 
@@ -22,9 +22,10 @@ class AuthTokenserializer(serializers.Serializer):
     )
 
 
-class GanreSerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
         model = Genre
 
 

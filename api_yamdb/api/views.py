@@ -1,13 +1,12 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
+from api.serializers import AuthTokenserializer, SignUpSerializer
+from api.utils import generate_and_send_confirmation_code_to_email
 from users.models import User
 from users.token import get_tokens_for_user
-
-from .serializers import AuthTokenserializer, SignUpSerializer
-from .utils import generate_and_send_confirmation_code_to_email
 
 
 @api_view(['POST'])

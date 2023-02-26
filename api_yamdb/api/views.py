@@ -5,12 +5,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from api.serializers import (AuthTokenserializer, CategorySerializer,
-                             CommentsSerializer, ReviewSerializer,
-                             SignUpSerializer)
+                             CommentsSerializer, GenreSerializer,
+                             ReviewSerializer, SignUpSerializer)
 from api.utils import generate_and_send_confirmation_code_to_email
-from reviews.models import Category, Review, Title
+from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from users.token import get_tokens_for_user
+
 
 @api_view(['POST'])
 def signup(request):

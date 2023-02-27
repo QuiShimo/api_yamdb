@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from api.permissions import IsAdminOrStaff
@@ -10,7 +10,7 @@ from api.serializers import (AuthTokenSerializer, CategorySerializer,
                              CommentsSerializer, GenreSerializer,
                              ReviewSerializer, SignUpSerializer,
                              UserSerializer)
-from api.utils import generate_and_send_confirmation_code_to_email
+from api.utils import send_confirmation_code_to_email
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from users.token import get_tokens_for_user
@@ -25,7 +25,7 @@ def signup(request):
         serializer.is_valid(raise_exception=True)
         if serializer.validated_data['username'] != 'me':
             serializer.save()
-            generate_and_send_confirmation_code_to_email(username)
+            send_confirmation_code_to_email(username)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(
             'Username указан неверно!', status=status.HTTP_400_BAD_REQUEST
@@ -37,7 +37,7 @@ def signup(request):
     serializer.is_valid(raise_exception=True)
     if serializer.validated_data['email'] == user.email:
         serializer.save()
-        generate_and_send_confirmation_code_to_email(username)
+        send_confirmation_code_to_email(username)
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(
         'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
@@ -109,6 +109,22 @@ class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminOrStaff]
+    filter_backends = [filters.SearchFilter]
     search_field = ('=username',)
+    lookup_field = 'username'
 
-
+    @action(
+        methods=['get', 'patch'],
+        detail=False,
+        permission_classes=[IsAuthenticated],
+    )
+    def me(self, request):
+        if request.method == 'PATCH':
+            serializer = UserSerializer(
+                request.user, data=request.data, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save(role=request.user.role)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)

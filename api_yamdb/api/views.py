@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
@@ -109,9 +109,10 @@ class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminOrStaff]
-    filter_backends = [filters.SearchFilter]
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_field = ('=username',)
     lookup_field = 'username'
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
         methods=['get', 'patch'],

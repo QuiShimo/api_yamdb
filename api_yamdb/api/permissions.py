@@ -6,4 +6,3 @@ class IsAdminOrStaff(permissions.BasePermission):
         if request.user.is_staff or (request.user.is_authenticated
                                      and request.user.is_admin):
             return True
-

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from api.permissions import IsAdminOrStaff
 from reviews.models import Category, Comments, Genre, Review, Title
 from users.models import User
 
@@ -10,7 +11,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         fields = ('email', 'username')
 
 
-class AuthTokenserializer(serializers.Serializer):
+class AuthTokenSerializer(serializers.Serializer):
     username = serializers.RegexField(
         regex=r'^[\w.@+-]+$',
         max_length=150,
@@ -79,6 +80,17 @@ class CommentsSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        models = Comments
+        model = Comments
         fields = ('id', 'text', 'author', 'pub_date')
         read_only_fields = ('pub_date',)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    permission_classes = [IsAdminOrStaff]
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role'
+        )

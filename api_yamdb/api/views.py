@@ -110,7 +110,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAdminOrStaff]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    search_field = ('=username',)
+    search_fields = ('=username',)
     lookup_field = 'username'
     http_method_names = ['get', 'post', 'patch', 'delete']
 

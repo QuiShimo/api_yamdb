@@ -47,5 +47,23 @@ class User(AbstractUser):
             )
         ]
 
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+    @property
+    def is_user(self):
+        if self.role == 'user':
+            return True
+        else:
+            return False
+
+    @property
+    def is_moderator(self):
+        if self.role == 'moderator':
+            return True
+        else:
+            return False
+
+    @property
+    def is_admin(self):
+        if self.role == 'admin':
+            return True
+        else:
+            return False

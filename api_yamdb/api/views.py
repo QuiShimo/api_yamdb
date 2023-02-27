@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.serializers import (AuthTokenserializer, CategorySerializer,
+from api.permissions import IsAdminOrStaff
+from api.serializers import (AuthTokenSerializer, CategorySerializer,
                              CommentsSerializer, GenreSerializer,
-                             ReviewSerializer, SignUpSerializer)
+                             ReviewSerializer, SignUpSerializer,
+                             UserSerializer)
 from api.utils import generate_and_send_confirmation_code_to_email
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
@@ -14,6 +17,7 @@ from users.token import get_tokens_for_user
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def signup(request):
     username = request.data.get('username')
     if not User.objects.filter(username=username).exists():
@@ -41,8 +45,9 @@ def signup(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def get_token(request):
-    serializer = AuthTokenserializer(data=request.data)
+    serializer = AuthTokenSerializer(data=request.data)
     if serializer.is_valid():
         user = get_object_or_404(User, username=request.data['username'])
         confirmation_code = serializer.data.get('confirmation_code')
@@ -98,3 +103,12 @@ class CommentsViewSet(viewsets.ModelViewSet):
             title__id=int(self.kwargs.get('title_id'))
         )
         return review.comments.all()
+
+
+class UsersViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminOrStaff]
+    search_field = ('=username',)
+
+

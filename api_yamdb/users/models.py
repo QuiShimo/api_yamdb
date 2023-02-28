@@ -1,8 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     """Модель пользователя"""
     CHOICES = (
         ('user', 'Аутентифицированный пользователь'),
@@ -67,3 +68,6 @@ class User(AbstractUser):
             return True
         else:
             return False
+
+
+User = get_user_model()

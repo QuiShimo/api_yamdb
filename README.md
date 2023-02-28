@@ -40,6 +40,3 @@ python api_yamdb/manage.py migrate
 ```
 python api_yamdb/manage.py runserver
 ```
-## Примеры работы с API для всех пользователей
-
-## Примеры работы с API для авторизованных пользователей

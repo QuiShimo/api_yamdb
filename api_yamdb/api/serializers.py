@@ -38,6 +38,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(read_only=True)
+
     class Meta:
         fields = '__all__'
         model = Title
@@ -55,6 +57,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'text', 'pub_date')
         read_only_fields = ('pub_date', )
 
+    def validate_score(self, value):
+        if 0 > value > 10:
+            raise serializers.ValidationError('Оценка должна быть от 1 до 10')
+        return value
+
     def validate(self, data):
         if self.context['request'].method != 'POST':
             return data
@@ -62,9 +69,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         title_id = self.context['view'].kwargs.get('title_id')
         author = self.context['request'].user
 
-        if Review.objects.filter(
-            author=author, title=title_id
-        ).exists():
+        if Review.objects.filter(author=author, title=title_id).exists():
             raise serializers.ValidationError(
                 ('Ошибка добавления отзыва к произведению: '
                  'вы уже добавляли отзыв к этопу произведению.')

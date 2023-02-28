@@ -6,8 +6,10 @@ from rest_framework.response import Response
 
 from api.serializers import (AuthTokenserializer, CategorySerializer,
                              CommentsSerializer, GenreSerializer,
-                             ReviewSerializer, SignUpSerializer)
+                             ReviewSerializer, SignUpSerializer,
+                             TitleSerializer)
 from api.utils import generate_and_send_confirmation_code_to_email
+from api.filters import FilterTitle
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from users.token import get_tokens_for_user
@@ -55,7 +57,7 @@ def get_token(request):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
 
@@ -63,9 +65,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    filter_backends = (DjangoFilterBackend,)
+    fifilterset_class = FilterTitle
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

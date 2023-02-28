@@ -1,4 +1,6 @@
+import datetime as dt
 from rest_framework import serializers
+
 
 from reviews.models import Category, Comments, Genre, Review, Title
 from users.models import User
@@ -24,22 +26,36 @@ class AuthTokenserializer(serializers.Serializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
+        model = Genre
         fields = ('name', 'slug')
         lookup_field = 'slug'
-        model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
+        model = Category
         fields = ('name', 'slug')
         lookup_field = 'slug'
-        model = Category
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        many=True,
+        queryset=Genre.objects.all(),
+        slug_field='slug')
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug')
+
     class Meta:
-        fields = '__all__'
         model = Title
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+
+    def validate_year(self, value):
+        year = dt.date.today().year
+        if not (value <= year):
+            raise serializers.ValidationError('Некоректный год.')
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):

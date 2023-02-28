@@ -113,7 +113,6 @@ class Review(models.Model):
     )
     text = models.TextField(
         verbose_name='Текст отзыва',
-        help_text=''
     )
     score = models.IntegerField(
         validators=(

@@ -1,8 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     """Модель пользователя"""
     CHOICES = (
         ('user', 'Аутентифицированный пользователь'),
@@ -47,5 +48,26 @@ class User(AbstractUser):
             )
         ]
 
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+    @property
+    def is_user(self):
+        if self.role == 'user':
+            return True
+        else:
+            return False
+
+    @property
+    def is_moderator(self):
+        if self.role == 'moderator':
+            return True
+        else:
+            return False
+
+    @property
+    def is_admin(self):
+        if self.role == 'admin':
+            return True
+        else:
+            return False
+
+
+User = get_user_model()

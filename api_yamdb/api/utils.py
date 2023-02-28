@@ -6,7 +6,7 @@ from rest_framework.generics import get_object_or_404
 from users.models import User
 
 
-def generate_and_send_confirmation_code_to_email(username):
+def send_confirmation_code_to_email(username):
     user = get_object_or_404(User, username=username)
     confirmation_code = int(''.join([str(random.randrange(0, 10))
                                      for _ in range(16)]))

@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,9 +10,8 @@ from api.serializers import (AuthTokenserializer, CategorySerializer,
                              ReviewSerializer, SignUpSerializer)
 from api.utils import generate_and_send_confirmation_code_to_email
 from reviews.models import Category, Genre, Review, Title
+from users.models import User
 from users.token import get_tokens_for_user
-
-User = get_user_model()
 
 
 @api_view(['POST'])

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 User = get_user_model()
 
@@ -114,6 +115,17 @@ class Review(models.Model):
     text = models.TextField(
         verbose_name='Текст отзыва',
         help_text=''
+    )
+    score = models.IntegerField(
+        validators=(
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ),
+        error_messages={
+            'validators': 'Оценка должна быть от 1 до 10!'
+        },
+        verbose_name='Оценка произведения',
+        help_text='Укажите оценку произведения'
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,

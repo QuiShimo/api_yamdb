@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
@@ -9,8 +11,9 @@ from api.serializers import (AuthTokenserializer, CategorySerializer,
                              ReviewSerializer, SignUpSerializer)
 from api.utils import generate_and_send_confirmation_code_to_email
 from reviews.models import Category, Genre, Review, Title
-from users.models import User
 from users.token import get_tokens_for_user
+
+User = get_user_model()
 
 
 @api_view(['POST'])
@@ -50,6 +53,12 @@ def get_token(request):
             return Response(get_tokens_for_user(user),
                             status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews_score')
+    ).all()
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

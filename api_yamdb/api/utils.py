@@ -1,9 +1,10 @@
 import random
 
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from rest_framework.generics import get_object_or_404
 
-from users.models import User
+User = get_user_model()
 
 
 def generate_and_send_confirmation_code_to_email(username):

@@ -61,7 +61,7 @@ def get_token(request):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
-        rating=Avg('reviews_score')
+        rating=Avg('reviews__score')
     ).all()
 
 

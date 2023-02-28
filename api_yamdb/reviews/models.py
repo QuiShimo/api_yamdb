@@ -66,7 +66,7 @@ class Title(models.Model):
         help_text='Укажите категорию',
     )
 
-    genres = models.ManyToManyField(
+    genre = models.ManyToManyField(
         Genre,
         through='GenreTitle',
         verbose_name='Жанр',

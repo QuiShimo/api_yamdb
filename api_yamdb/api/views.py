@@ -10,7 +10,8 @@ from api.permissions import IsAdminOrStaff
 from api.serializers import (AuthTokenSerializer, CategorySerializer,
                              CommentsSerializer, GenreSerializer,
                              ReviewSerializer, SignUpSerializer,
-                             UserSerializer)
+                             TitleSerializer, UserSerializer)
+from api.filters import FilterTitle
 from api.utils import send_confirmation_code_to_email
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
@@ -67,7 +68,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
 
@@ -75,9 +76,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    filter_backends = (DjangoFilterBackend,)
+    fifilterset_class = FilterTitle
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

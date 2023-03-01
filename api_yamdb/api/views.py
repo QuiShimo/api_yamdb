@@ -16,6 +16,7 @@ from api.serializers import (AuthTokenSerializer, CategorySerializer,
 from api.filters import FilterTitle
 from api.utils import send_confirmation_code_to_email
 from api.mixins import ModelMixinSet
+from api_yamdb.settings import NOT_ALLOWED_USERNAME
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from users.token import get_tokens_for_user
@@ -28,12 +29,13 @@ def signup(request):
     if not User.objects.filter(username=username).exists():
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if serializer.validated_data['username'] != 'me':
+        if serializer.validated_data['username'] != NOT_ALLOWED_USERNAME:
             serializer.save()
             send_confirmation_code_to_email(username)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(
-            'Username указан неверно!', status=status.HTTP_400_BAD_REQUEST
+            'Использование имени пользователя "me" запрещено!',
+            status=status.HTTP_400_BAD_REQUEST
         )
     user = get_object_or_404(User, username=username)
     serializer = SignUpSerializer(
@@ -41,7 +43,7 @@ def signup(request):
     )
     serializer.is_valid(raise_exception=True)
     if serializer.validated_data['email'] == user.email:
-        serializer.save()
+        serializer.save(raise_exception=True)
         send_confirmation_code_to_email(username)
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(

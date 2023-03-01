@@ -26,28 +26,28 @@ from users.token import get_tokens_for_user
 @permission_classes((AllowAny,))
 def signup(request):
     username = request.data.get('username')
-    if not User.objects.filter(username=username).exists():
-        serializer = SignUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if serializer.validated_data['username'] != NOT_ALLOWED_USERNAME:
-            serializer.save()
-            send_confirmation_code_to_email(username)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            'Использование имени пользователя "me" запрещено!',
-            status=status.HTTP_400_BAD_REQUEST
+    if User.objects.filter(username=username).exists():
+        user = get_object_or_404(User, username=username)
+        serializer = SignUpSerializer(
+            user, data=request.data, partial=True
         )
-    user = get_object_or_404(User, username=username)
-    serializer = SignUpSerializer(
-        user, data=request.data, partial=True
-    )
-    serializer.is_valid(raise_exception=True)
-    if serializer.validated_data['email'] == user.email:
+        serializer.is_valid(raise_exception=True)
+        if serializer.validated_data['email'] != user.email:
+            return Response(
+                'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save(raise_exception=True)
         send_confirmation_code_to_email(username)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    serializer = SignUpSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    if serializer.validated_data['username'] != NOT_ALLOWED_USERNAME:
+        serializer.save()
+        send_confirmation_code_to_email(username)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(
-        'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
+        'Использование имени пользователя "me" запрещено!',
+        status=status.HTTP_400_BAD_REQUEST
     )
 
 

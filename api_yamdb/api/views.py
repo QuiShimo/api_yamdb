@@ -6,16 +6,16 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.permissions import (IsAdminOrStaff, IsAdminModeratorAuthorOrReadOnly,
+from api.filters import FilterTitle
+from api.mixins import ModelMixinSet
+from api.permissions import (IsAdminModeratorAuthorOrReadOnly, IsAdminOrStaff,
                              IsAdminUserOrReadOnly)
 from api.serializers import (AuthTokenSerializer, CategorySerializer,
                              CommentsSerializer, GenreSerializer,
                              ReviewSerializer, SignUpSerializer,
                              TitleReadSerializer, TitleWriteSerializer,
                              UserSerializer)
-from api.filters import FilterTitle
 from api.utils import send_confirmation_code_to_email
-from api.mixins import ModelMixinSet
 from api_yamdb.settings import NOT_ALLOWED_USERNAME
 from reviews.models import Category, Genre, Review, Title
 from users.models import User

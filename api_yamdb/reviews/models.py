@@ -1,6 +1,6 @@
-from django.db import models
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from users.models import User
 
@@ -17,7 +17,7 @@ class Category(models.Model):
         verbose_name='Индификатор',
         help_text='Необходим индификатор категории',
     )
-    
+
     class Meta:
         ordering = ('name',)
         verbose_name = 'Категория'

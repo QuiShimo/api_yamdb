@@ -1,5 +1,6 @@
 import random
 
+from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework.generics import get_object_or_404
 
@@ -14,8 +15,8 @@ def send_confirmation_code_to_email(username):
     send_mail(
         'Код подтвержения для завершения регистрации',
         f'Ваш код для получения JWT токена {user.confirmation_code}',
-        'admin@yamdb.com',
-        [user.email],
+        settings.ADMIN_EMAIL,
+        (user.email,),
         fail_silently=False,
     )
     user.save()

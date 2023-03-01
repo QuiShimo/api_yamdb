@@ -128,7 +128,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    permission_classes = [IsAdminOrStaff]
+    permission_classes = (IsAdminOrStaff,)
 
     class Meta:
         model = User

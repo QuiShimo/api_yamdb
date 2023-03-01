@@ -21,8 +21,8 @@ from users.models import User
 from users.token import get_tokens_for_user
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@api_view(('POST',))
+@permission_classes((AllowAny,))
 def signup(request):
     username = request.data.get('username')
     if not User.objects.filter(username=username).exists():
@@ -49,8 +49,8 @@ def signup(request):
     )
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@api_view(('POST',))
+@permission_classes((AllowAny,))
 def get_token(request):
     serializer = AuthTokenSerializer(data=request.data)
     if serializer.is_valid():
@@ -135,16 +135,16 @@ class CommentsViewSet(viewsets.ModelViewSet):
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdminOrStaff]
+    permission_classes = (IsAdminOrStaff,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('=username',)
     lookup_field = 'username'
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete',)
 
     @action(
-        methods=['get', 'patch'],
+        methods=('get', 'patch',),
         detail=False,
-        permission_classes=[IsAuthenticated],
+        permission_classes=(IsAuthenticated,),
     )
     def me(self, request):
         if request.method == 'PATCH':

@@ -127,3 +127,5 @@ SIMPLE_JWT = {
 
 MIN_SCORE_VALUE = 1
 MAX_SCORE_VALUE = 10
+
+ADMIN_EMAIL = 'admin@yamdb.com'

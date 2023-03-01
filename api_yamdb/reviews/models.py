@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import User
@@ -116,11 +117,14 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(settings.MIN_SCORE_VALUE),
+            MaxValueValidator(settings.MAX_SCORE_VALUE)
         ),
         error_messages={
-            'validators': 'Оценка должна быть от 1 до 10!'
+            'validators': (
+                f'Оценка должна быть от {settings.MIN_SCORE_VALUE}'
+                f'до {settings.MAX_SCORE_VALUE}!'
+            )
         },
         verbose_name='Оценка произведения',
         help_text='Укажите оценку произведения'
@@ -140,7 +144,7 @@ class Review(models.Model):
         )
 
     def __str__(self) -> str:
-        return self.text
+        return self.text[:15]
 
 
 class Comments(models.Model):
@@ -167,3 +171,6 @@ class Comments(models.Model):
         verbose_name='Дата публикации комментария',
         help_text='Дата публикации проставляется автоматически'
     )
+
+    def __str__(self) -> str:
+        return self.text[:15]

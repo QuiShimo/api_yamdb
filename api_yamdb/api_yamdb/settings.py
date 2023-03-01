@@ -123,3 +123,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
+
+
+MIN_SCORE_VALUE = 1
+MAX_SCORE_VALUE = 10

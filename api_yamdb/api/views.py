@@ -6,16 +6,17 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.permissions import (IsAdminOrStaff, IsAdminModeratorAuthorOrReadOnly,
+from api.filters import FilterTitle
+from api.mixins import ModelMixinSet
+from api.permissions import (IsAdminModeratorAuthorOrReadOnly, IsAdminOrStaff,
                              IsAdminUserOrReadOnly)
 from api.serializers import (AuthTokenSerializer, CategorySerializer,
                              CommentsSerializer, GenreSerializer,
                              ReviewSerializer, SignUpSerializer,
                              TitleReadSerializer, TitleWriteSerializer,
                              UserSerializer)
-from api.filters import FilterTitle
 from api.utils import send_confirmation_code_to_email
-from api.mixins import ModelMixinSet
+from api_yamdb.settings import NOT_ALLOWED_USERNAME
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from users.token import get_tokens_for_user
@@ -25,27 +26,28 @@ from users.token import get_tokens_for_user
 @permission_classes((AllowAny,))
 def signup(request):
     username = request.data.get('username')
-    if not User.objects.filter(username=username).exists():
-        serializer = SignUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if serializer.validated_data['username'] != 'me':
-            serializer.save()
-            send_confirmation_code_to_email(username)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            'Username указан неверно!', status=status.HTTP_400_BAD_REQUEST
+    if User.objects.filter(username=username).exists():
+        user = get_object_or_404(User, username=username)
+        serializer = SignUpSerializer(
+            user, data=request.data, partial=True
         )
-    user = get_object_or_404(User, username=username)
-    serializer = SignUpSerializer(
-        user, data=request.data, partial=True
-    )
+        serializer.is_valid(raise_exception=True)
+        if serializer.validated_data['email'] != user.email:
+            return Response(
+                'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save(raise_exception=True)
+        send_confirmation_code_to_email(username)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    if serializer.validated_data['email'] == user.email:
+    if serializer.validated_data['username'] != NOT_ALLOWED_USERNAME:
         serializer.save()
         send_confirmation_code_to_email(username)
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(
-        'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
+        'Использование имени пользователя "me" запрещено!',
+        status=status.HTTP_400_BAD_REQUEST
     )
 
 

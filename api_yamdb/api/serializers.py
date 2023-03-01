@@ -1,11 +1,10 @@
-import datetime as dt
-
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from api.permissions import IsAdminOrStaff
 from reviews.models import Category, Comments, Genre, Review, Title
+from reviews.validators import validate_title_year
 from users.models import User
 
 USERNAME_CHECK = r'^[\w.@+-]+$'  # Проверка имени на отсутствие спецсимволов
@@ -72,10 +71,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         model = Title
 
     def validate_year(self, value):
-        year = dt.date.today().year
-        if not (value <= year):
-            raise serializers.ValidationError('Некоректный год.')
-        return value
+        return validate_title_year(value)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

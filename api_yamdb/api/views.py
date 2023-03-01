@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -16,7 +17,6 @@ from api.serializers import (AuthTokenSerializer, CategorySerializer,
                              TitleReadSerializer, TitleWriteSerializer,
                              UserSerializer)
 from api.utils import send_confirmation_code_to_email
-from api_yamdb.settings import NOT_ALLOWED_USERNAME
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from users.token import get_tokens_for_user
@@ -39,14 +39,18 @@ def signup(request):
         serializer.save(raise_exception=True)
         send_confirmation_code_to_email(username)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    if serializer.validated_data['username'] != NOT_ALLOWED_USERNAME:
+    if serializer.validated_data['username'] != settings.NOT_ALLOWED_USERNAME:
         serializer.save()
         send_confirmation_code_to_email(username)
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(
-        'Использование имени пользователя "me" запрещено!',
+        (
+            f'Использование имени пользователя '
+            f'{settings.NOT_ALLOWED_USERNAME} запрещено!'
+        ),
         status=status.HTTP_400_BAD_REQUEST
     )
 
@@ -55,12 +59,11 @@ def signup(request):
 @permission_classes((AllowAny,))
 def get_token(request):
     serializer = AuthTokenSerializer(data=request.data)
-    if serializer.is_valid():
-        user = get_object_or_404(User, username=request.data['username'])
-        confirmation_code = serializer.data.get('confirmation_code')
-        if confirmation_code == str(user.confirmation_code):
-            return Response(get_tokens_for_user(user),
-                            status=status.HTTP_200_OK)
+    serializer.is_valid(raise_exception=True)
+    user = get_object_or_404(User, username=request.data['username'])
+    confirmation_code = serializer.data.get('confirmation_code')
+    if confirmation_code == str(user.confirmation_code):
+        return Response(get_tokens_for_user(user), status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -138,7 +141,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminOrStaff,)
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('=username',)
     lookup_field = 'username'
     http_method_names = ('get', 'post', 'patch', 'delete',)

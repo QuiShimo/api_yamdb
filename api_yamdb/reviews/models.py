@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from reviews.validators import validate_title_year
 from users.models import User
 
 
@@ -66,6 +67,7 @@ class Title(models.Model):
     year = models.IntegerField(
         verbose_name='Дата выхода',
         help_text='Укажите дату выхода',
+        validators=(validate_title_year,)
     )
 
     category = models.ForeignKey(
@@ -73,7 +75,7 @@ class Title(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         related_name='titles',
-        verbose_name='Катигория',
+        verbose_name='Категория',
         help_text='Укажите категорию',
     )
 

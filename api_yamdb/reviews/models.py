@@ -17,6 +17,11 @@ class Category(models.Model):
         verbose_name='Индификатор',
         help_text='Необходим индификатор категории',
     )
+    
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -34,6 +39,11 @@ class Genre(models.Model):
         verbose_name='Идентификатор',
         help_text='Необходим индификатор жанра',
     )
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.name
@@ -73,6 +83,11 @@ class Title(models.Model):
         verbose_name='Жанр',
         help_text='Укажите жанр',
     )
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
@@ -136,6 +151,9 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ('pub_date',)
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
         constraints = (
             models.UniqueConstraint(
                 fields=('author', 'title'),
@@ -171,6 +189,11 @@ class Comments(models.Model):
         verbose_name='Дата публикации комментария',
         help_text='Дата публикации проставляется автоматически'
     )
+
+    class Meta:
+        ordering = ('pub_date',)
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self) -> str:
         return self.text[:15]

@@ -1,10 +1,9 @@
 from csv import DictReader
+
 from django.core.management.base import BaseCommand
 
-
 from api_yamdb.settings import BASE_DIR
-from reviews.models import (Category, Genre, Title,
-                            GenreTitle, Comments, Review)
+from reviews.models import Category, Comments, Genre, GenreTitle, Review, Title
 from users.models import CustomUser
 
 

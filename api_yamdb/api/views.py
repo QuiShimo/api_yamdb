@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -6,59 +7,63 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.permissions import (IsAdminOrStaff, IsAdminModeratorAuthorOrReadOnly,
+from api.filters import FilterTitle
+from api.mixins import ModelMixinSet
+from api.permissions import (IsAdminModeratorAuthorOrReadOnly, IsAdminOrStaff,
                              IsAdminUserOrReadOnly)
 from api.serializers import (AuthTokenSerializer, CategorySerializer,
                              CommentsSerializer, GenreSerializer,
                              ReviewSerializer, SignUpSerializer,
                              TitleReadSerializer, TitleWriteSerializer,
                              UserSerializer)
-from api.filters import FilterTitle
 from api.utils import send_confirmation_code_to_email
-from api.mixins import ModelMixinSet
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from users.token import get_tokens_for_user
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@api_view(('POST',))
+@permission_classes((AllowAny,))
 def signup(request):
     username = request.data.get('username')
-    if not User.objects.filter(username=username).exists():
-        serializer = SignUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if serializer.validated_data['username'] != 'me':
-            serializer.save()
-            send_confirmation_code_to_email(username)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            'Username указан неверно!', status=status.HTTP_400_BAD_REQUEST
+    if User.objects.filter(username=username).exists():
+        user = get_object_or_404(User, username=username)
+        serializer = SignUpSerializer(
+            user, data=request.data, partial=True
         )
-    user = get_object_or_404(User, username=username)
-    serializer = SignUpSerializer(
-        user, data=request.data, partial=True
-    )
+        serializer.is_valid(raise_exception=True)
+        if serializer.validated_data['email'] != user.email:
+            return Response(
+                'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save(raise_exception=True)
+        send_confirmation_code_to_email(username)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    if serializer.validated_data['email'] == user.email:
+    if serializer.validated_data['username'] != settings.NOT_ALLOWED_USERNAME:
         serializer.save()
         send_confirmation_code_to_email(username)
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(
-        'Почта указана неверно!', status=status.HTTP_400_BAD_REQUEST
+        (
+            f'Использование имени пользователя '
+            f'{settings.NOT_ALLOWED_USERNAME} запрещено!'
+        ),
+        status=status.HTTP_400_BAD_REQUEST
     )
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
+@api_view(('POST',))
+@permission_classes((AllowAny,))
 def get_token(request):
     serializer = AuthTokenSerializer(data=request.data)
-    if serializer.is_valid():
-        user = get_object_or_404(User, username=request.data['username'])
-        confirmation_code = serializer.data.get('confirmation_code')
-        if confirmation_code == str(user.confirmation_code):
-            return Response(get_tokens_for_user(user),
-                            status=status.HTTP_200_OK)
+    serializer.is_valid(raise_exception=True)
+    user = get_object_or_404(User, username=request.data['username'])
+    confirmation_code = serializer.data.get('confirmation_code')
+    if confirmation_code == str(user.confirmation_code):
+        return Response(get_tokens_for_user(user), status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -135,16 +140,16 @@ class CommentsViewSet(viewsets.ModelViewSet):
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdminOrStaff]
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    permission_classes = (IsAdminOrStaff,)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('=username',)
     lookup_field = 'username'
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete',)
 
     @action(
-        methods=['get', 'patch'],
+        methods=('get', 'patch',),
         detail=False,
-        permission_classes=[IsAuthenticated],
+        permission_classes=(IsAuthenticated,),
     )
     def me(self, request):
         if request.method == 'PATCH':

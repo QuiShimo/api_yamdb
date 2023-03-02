@@ -1,10 +1,13 @@
-import datetime as dt
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from api.permissions import IsAdminOrStaff
 from reviews.models import Category, Comments, Genre, Review, Title
+from reviews.validators import validate_title_year
 from users.models import User
+
+USERNAME_CHECK = r'^[\w.@+-]+$'  # Проверка имени на отсутствие спецсимволов
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -15,7 +18,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class AuthTokenSerializer(serializers.Serializer):
     username = serializers.RegexField(
-        regex=r'^[\w.@+-]+$',
+        regex=USERNAME_CHECK,
         max_length=150,
         required=True
     )
@@ -68,10 +71,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         model = Title
 
     def validate_year(self, value):
-        year = dt.date.today().year
-        if not (value <= year):
-            raise serializers.ValidationError('Некоректный год.')
-        return value
+        return validate_title_year(value)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -85,7 +85,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     def validate_score(self, value):
-        if 0 > value > 10:
+        if settings.MIN_SCORE_VALUE > value > settings.MAX_SCORE_VALUE:
             raise serializers.ValidationError('Оценка по 10-бальной шкале!')
         return value
 
@@ -95,8 +95,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         title_id = self.context.get('view').kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         if (
-            request.method == 'POST'
-            and Review.objects.filter(title=title, author=author).exists()
+                request.method == 'POST'
+                and Review.objects.filter(title=title, author=author).exists()
         ):
             raise serializers.ValidationError(
                 'Может существовать только один отзыв!'
@@ -126,7 +126,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    permission_classes = [IsAdminOrStaff]
+    permission_classes = (IsAdminOrStaff,)
 
     class Meta:
         model = User

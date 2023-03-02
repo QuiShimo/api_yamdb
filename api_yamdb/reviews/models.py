@@ -1,6 +1,8 @@
-from django.db import models
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
+from reviews.validators import validate_title_year
 from users.models import User
 
 
@@ -16,6 +18,11 @@ class Category(models.Model):
         verbose_name='Индификатор',
         help_text='Необходим индификатор категории',
     )
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -33,6 +40,11 @@ class Genre(models.Model):
         verbose_name='Идентификатор',
         help_text='Необходим индификатор жанра',
     )
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.name
@@ -55,6 +67,7 @@ class Title(models.Model):
     year = models.IntegerField(
         verbose_name='Дата выхода',
         help_text='Укажите дату выхода',
+        validators=(validate_title_year,)
     )
 
     category = models.ForeignKey(
@@ -62,7 +75,7 @@ class Title(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         related_name='titles',
-        verbose_name='Катигория',
+        verbose_name='Категория',
         help_text='Укажите категорию',
     )
 
@@ -72,6 +85,11 @@ class Title(models.Model):
         verbose_name='Жанр',
         help_text='Укажите жанр',
     )
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
@@ -116,11 +134,14 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(settings.MIN_SCORE_VALUE),
+            MaxValueValidator(settings.MAX_SCORE_VALUE)
         ),
         error_messages={
-            'validators': 'Оценка должна быть от 1 до 10!'
+            'validators': (
+                f'Оценка должна быть от {settings.MIN_SCORE_VALUE}'
+                f'до {settings.MAX_SCORE_VALUE}!'
+            )
         },
         verbose_name='Оценка произведения',
         help_text='Укажите оценку произведения'
@@ -132,6 +153,9 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ('pub_date',)
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
         constraints = (
             models.UniqueConstraint(
                 fields=('author', 'title'),
@@ -140,7 +164,7 @@ class Review(models.Model):
         )
 
     def __str__(self) -> str:
-        return self.text
+        return self.text[:15]
 
 
 class Comments(models.Model):
@@ -167,3 +191,11 @@ class Comments(models.Model):
         verbose_name='Дата публикации комментария',
         help_text='Дата публикации проставляется автоматически'
     )
+
+    class Meta:
+        ordering = ('pub_date',)
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self) -> str:
+        return self.text[:15]

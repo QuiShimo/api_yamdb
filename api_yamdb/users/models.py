@@ -45,15 +45,15 @@ class CustomUser(AbstractUser):
     )
 
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
         ordering = ('-id',)
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
                 fields=('username', 'email'),
                 name='unique_username_email'
-            )
-        ]
+            ),
+        )
 
     def __str__(self):
         return self.username

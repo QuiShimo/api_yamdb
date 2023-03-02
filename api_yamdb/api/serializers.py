@@ -86,7 +86,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate_score(self, value):
         if settings.MIN_SCORE_VALUE > value > settings.MAX_SCORE_VALUE:
-            raise serializers.ValidationError('Оценка по 10-бальной шкале!')
+            raise serializers.ValidationError(
+                (f'Оценка должна быть от {settings.MIN_SCORE_VALUE}'
+                 f'до {settings.MAX_SCORE_VALUE}!')
+            )
         return value
 
     def validate(self, data):

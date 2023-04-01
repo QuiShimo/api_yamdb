@@ -16,16 +16,16 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'description', 'year', 'category', 'genre')
+    list_display = ('pk', 'name', 'description', 'year', 'category')
     search_fields = ('name',)
-    list_filter = ('year', 'category', 'genre')
+    list_filter = ('year', 'category')
     empty_value_diplay = '-пусто-'
 
 
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'author', 'title', 'text', 'pub_date')
-    search_fields = ('author', 'title', 'text')
-    list_filter = ('author', 'title', 'pub_date')
+    list_display = ('pk', 'author', 'text', 'pub_date')
+    search_fields = ('author', 'text')
+    list_filter = ('author', 'pub_date')
     empty_value_diplay = '-пусто-'
 
 
